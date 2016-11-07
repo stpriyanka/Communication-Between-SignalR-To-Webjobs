@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using Microsoft.AspNet.SignalR;
 using Newtonsoft.Json;
 
@@ -80,7 +79,7 @@ namespace WebJobAsSingalRClient
 
 		public override Task OnReconnected()
 		{
-			string jobId = GetUserId();
+			string jobId = GetQueryString();
 
 			if (!Connections.GetConnections(jobId).Contains(Context.ConnectionId))
 			{
@@ -93,14 +92,14 @@ namespace WebJobAsSingalRClient
 
 		public override Task OnDisconnected(bool stopCalled)
 		{
-			string jobid = GetUserId();
+			string jobid = GetQueryString();
 
 			Connections.Remove(jobid, Context.ConnectionId);
 
 			return base.OnDisconnected(stopCalled);
 		}
 
-		private string GetUserId()
+		private string GetQueryString()
 		{
 			string userId = Context.QueryString["userid"];
 			return userId;
