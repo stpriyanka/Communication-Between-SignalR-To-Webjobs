@@ -1,0 +1,81 @@
+﻿
+<br />
+
+
+<address>
+	<strong>User 2</strong> <br />
+</address>
+
+
+<p style="font-family: monospace;color: blueviolet;"><b>Data receives from web job :</b> <span id="progress-span">0</span></p>
+
+@section scripts {
+	@Scripts.Render("~/bundles/jquery")
+	@*<script src="~/Scripts/jquery.signalR-2.2.0.min.js"></script>*@
+	<script src="~/Scripts/jquery.signalR-2.2.0.js"></script>
+	@*<script src="~/signalr/hubs"></script>*@
+	<script src="http://localhost:2120/signalr/hubs"></script>
+
+	<script type="text/javascript">
+		$(document).ready(function () {
+			// Reference the auto-generated proxy for the hub.
+			//3var myHub = conn.createHubProxy('MyHub');
+
+			//4alert($.connection);
+
+			//myHub.client.send = function (status) {
+			//	//debugger;
+			//	$("#progress-span").text(status);
+			//	console.log("Progress: " + status);
+
+			//};
+
+			//5myHub.on('SendMessage', function (status) {
+			//6$('#progress-span').text(status);
+			//7});
+
+			//8conn.logging = true;
+			//9conn.start();
+
+			//$('#sendmessage').click(function () {
+			//	// Call the Send method on the hub.
+			//	myHub.server.send($('#progress-span').val());
+			//	// Clear text box and reset focus for next comment.
+			//	$('#message').val('').focus();
+			//});
+
+
+			console.log($.connection);
+
+			$.connection.hub.url = "http://localhost:53561/signalr";
+
+
+			//	Create a function that the hub can call to send messages
+
+			var chatHubProxy = $.connection.myHub;
+
+			chatHubProxy.client.send = function (status) {
+				console.log(' ' + status);
+				$("#progress-span").text('[Dynamic] OrgId-UserId  ' + status);
+			};
+
+			//$.connection.hub.qs = { 'oid': '4356-1144' };
+			$.connection.hub.qs = { 'orgid': '4356' };
+			$.connection.hub.qs = { 'uid': '11' };
+
+			$.connection.hub.logging = true;
+			$.connection.hub.start().done(function () {
+				// call sendMessage on the server.
+				//chatHubProxy.server.sendMessage($('#progress-span').val());
+				//	$('#progress-span').val('').focus();
+				//console.log(send);
+
+
+			});
+			$.connection.hub.error(function (error) {
+				console.log('SignalR error: ' + error)
+			});
+
+		});
+	</script>
+}
