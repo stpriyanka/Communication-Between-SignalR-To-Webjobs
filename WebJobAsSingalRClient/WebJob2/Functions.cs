@@ -22,11 +22,10 @@ namespace WebJob2
 		[NoAutomaticTrigger]
 		public static void ManualTrigger(TextWriter log, int value, [Queue("queue")] out string message)
 		{
-			var c = new Functions();
+			var functions = new Functions();
+			functions.InvokeHub().Wait();
 
-			c.InvokeHub().Wait();
-
-			message = "hi.";
+			message = "Pushed data to server.";
 			Console.Write(message);
 
 			log.WriteLine("Following message will be written on the Queue={0}", message);
@@ -35,29 +34,21 @@ namespace WebJob2
 
 		public async Task InvokeHub()
 		{
-			var complexObject = new List<UserDetails>
+			var userdetails = new List<UserDetails>
            {
-			new UserDetails{ UserId = 1143, OrgId= 4356 },
-			new UserDetails{ UserId = 1144, OrgId= 4356 }
+			new UserDetails{ UserId = 56-43 },
+			new UserDetails{ UserId = 55-44 }
            };
 
-			//const int data = 1143;
-			//new JavaScriptSerializer().Serialize(complexObject);
-
-			var data = JsonConvert.SerializeObject(complexObject);
+			var data = JsonConvert.SerializeObject(userdetails);
 
 			Console.WriteLine(data);
-			//Thread.Sleep(100000);
 
 			var hub = new HubConnection("http://localhost:53561/");
-
 			var proxy = hub.CreateHubProxy("MyHub");
-
 			await hub.Start();
 			await proxy.Invoke("SendMessage", data);
-
 			hub.Stop();
-
 		}
 	}
 }

@@ -9,10 +9,9 @@ namespace WebJobAsSingalRClient
 {
 	public class UserDetails
 	{
-		public int OrgId { get; set; }
 		public int UserId { get; set; }
-		public List<string> ConnectionIds { get; set; }
 	}
+
 
 	public class MyHub : Hub
 	{
@@ -20,54 +19,29 @@ namespace WebJobAsSingalRClient
 
 		public async Task SendMessage(string message)
 		{
-			var x = message;
-			
 			var receivedData = (List<UserDetails>)JsonConvert.DeserializeObject(message, typeof(List<UserDetails>));
-
-			#region
 
 			foreach (var eachItem in receivedData)
 			{
-				Console.WriteLine(eachItem.UserId);
+				var onlineUserId = eachItem.UserId.ToString();
 
-				var onlineUserId = eachItem.UserId;
-				var onlineUserOrgId = eachItem.OrgId;
+				string uniqueData = GetQueryString();
 
-				string jobid = GetUserId();
-
-				if (jobid == null)
+				if (uniqueData != null)
 				{
-					jobid = onlineUserOrgId + "-" + onlineUserId;
-
-
-					foreach (var connectionId in Connections.GetConnections(jobid))
+					if (uniqueData != onlineUserId) continue;
+					foreach (var connectionId in Connections.GetConnections(uniqueData))
 					{
-						//var complexObject = new List<FakeNotificationModel>
-						//{
-						// new FakeNotificationModel(){ Name = "MyName", Age= 100 },
-						// new FakeNotificationModel(){ Name = "YourName", Age= 435 }
-						//};
-						////var json = new JavaScriptSerializer().Serialize(complexObject);
-
-						var json = onlineUserId;
-						await Clients.Client(connectionId).send(json);
-					}
-				}
-				else
-				{
-					foreach (var connectionId in Connections.GetConnections(jobid))
-					{
-						await Clients.Client(connectionId).send(jobid);
+						await Clients.Client(connectionId).send(uniqueData + " hello !");
 					}
 				}
 			}
-			#endregion
 		}
 
 
 		public override Task OnConnected()
 		{
-			string jobid = GetUserId();
+			string jobid = GetQueryString();
 
 			if (jobid != null)
 			{
